@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!-- Dependencies for jquery terminal library -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.terminal/js/jquery.terminal.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.terminal/css/jquery.terminal.min.css"/>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
+    <!-- Terminal commands -->
+    <script>
+        $(function() { //I think you can only have one set of terminal commands
+            $('#terminal').terminal({ //commands are passed to the terminal as an object
+                open: function(){ //this is the commands object
+                    console.log("open function called");
+                    this.echo("open function!"); //this accesses the Terminal object (a standard JQuery object)
+                },
+                print:{ //nested commands
+                    string: function(str){
+                        this.echo(str) //can print strings
+                    }, array: function(str1, str2, str3) {
+                        this.echo([str1, str2, str3]) //string arrays
+                    }, fun: function(){
+                        this.echo(funResult()) //or returns from a function
+                    }, dom: function(){ //or return dom nodes
+                        var div = $('<p>Hello <em><strong>World</strong></em>prin</p>');
+                        this.echo(div);
+                    }
+                },
+                close: function(arg1, arg2){
+                    console.log(`${arg1} is arg1 and ${arg2} is arg2`);
+                },
+                name: function(name) {
+                    this.read('last name: ', lastName => {
+                        this.echo('Your name is ' + name + ' ' + lastName);
+                    });
+                },
+                typing: function(string) {
+                    this.echo(string, {typing: true, delay: 30}); //makes a typing animation
+                },
+                typingMultiple: async function() { //if you type more than one thing, you need to await the previous
+                    await this.echo("Hello", {typing: true, delay: 20});
+                    await this.echo("World HelloHelloHelloHello", {typing: true, delay: 100});
+                },
+                link: function() {
+                    this.echo("https://www.google.com", {typing: true, delay: 100});
+                },
+                cat: function() {
+                    //I put a date-time part in the image url to force the browser to not use its cached image
+                    //Otherwise the same cat image would appear over and over
+                    //Warning: this does fill up the browser cache!
+                    var newImage = new Image();
+                    newImage.src = "https://cataas.com/c/s/Deze%20kat%20vind%20mij%20de%20beste%20kandidaat!?" + new Date().getTime();
+                    newImage.height = window.innerHeight * 0.6;
+                    this.echo(newImage);
+                }, 
+                file: function() { //be mindful that indentation also prints
+                    var reply = "";
+                    reply += `
+    function a              what it does
+    function b              what it does
+    function c              what it does
+
+    a link here?
+    [[!;;;;https://google.com]visit google]
+
+    formatted example: [[b;red;white]hello world]
+
+    Long long long long Long long long long Long long long long Long long loooooooooooooooooooooooooooooooooooooong long Long long long long line.
+                    `
+                    this.echo(reply, {keepWords: true} );
+                }
+            },{ //Pass terminal options here
+
+                // greetings: function(callback){
+                //     var text = "Welcome to my terminal :)";
+                //     callback(this.cols() > text.length ? text : "Welcome"); //prevents text overflow out of the line
+                // }
+                greetings: greetings.innerHTML, //use whatever is in the template
+                prompt: "[[;green;]>>> ]",
+                height: window.innerHeight-100
+            })
+        });
+
+        function funResult(){
+            return "This was a function result";
+        };
+
+
+    </script>
+</head>
+
+<style>
+    .terminal {
+        --color: rgba(0, 180, 0, 0.99);
+        --background: black;
+        --link-color: blue;
+        --size: 1.5;
+        --animation: terminal-glow;
+        --glow: 1;
+    }
+
+    .cmd-cursor {
+        --original-color: green;
+    }
+
+    h1 {
+        color: rgba(0,200,0,1);
+        text-align: center;
+    }
+</style>
+
+
+<body>
+    
+    <template id="greetings">
+         _    _      _ _                            _     _ 
+        | |  | |    | | |                          | |   | |
+        | |__| | ___| | | ___   __      _____  _ __| | __| |
+        |  __  |/ _ \ | |/ _ \  \ \ /\ / / _ \| '__| |/ _` |
+        | |  | |  __/ | | (_) |  \ V  V / (_) | |  | | (_| |
+        |_|  |_|\___|_|_|\___/    \_/\_/ \___/|_|  |_|\__,_|
+    
+    Welkomsttext
+    </template>
+
+    <div 
+        class="bg-image" 
+        style="
+            background-image: url('https://cdn.discordapp.com/attachments/789615526846267392/1123578176745000971/Schermafbeelding_2020-11-09_195259_2022_06_23_09_15_31_UTC.png');
+            height: 100vh;
+        "
+    >
+
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div>
+                        <p>&nbsp;</p>
+                    </div>
+                    <div id="terminal"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
